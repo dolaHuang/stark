@@ -12,9 +12,18 @@ from django.shortcuts import HttpResponse
 from django.urls import reverse
 from django import forms
 from django.db import transaction
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from django.conf import settings
-from stark.service.stark import StarkConfig, Option, get_chioce_text
+from stark.service.stark import StarkConfig, Option, get_chioce_text,Row
+
+
+# 组合搜索的时候，自定制显示的条件的去重，有一样的，只显示一个
+class DistinctNameOption(Option):
+
+    def get_queryset(self, _field, model_class, query_dict):
+        row = Row(model_class.objects.filter(**self.condition).values_list('name').distinct(), self, query_dict)
+        return row
 
 
 class CustomerConfig(StarkConfig):
@@ -44,6 +53,7 @@ class CustomerConfig(StarkConfig):
     search_list = ['name']
 
     filter_list = [
+        DistinctNameOption('name',condition={'id__gt':9},value_func=lambda x:x[0],text_func=lambda x:x[0]),
         Option('status', isChoice=True, text_func=lambda x: x[1]),
         Option('source', isChoice=True, text_func=lambda x: x[1]),
         Option('gender', isChoice=True, text_func=lambda x: x[1])

@@ -88,6 +88,8 @@
 
     class PriModelForm(forms.ModelForm) # 自定制ModelForm显示的field
 
+    class DistinctNameOption(Option) # # 组合搜索的时候，自定制显示的条件的去重，有一样的，只显示一个
+
     def multi_init(self, request)  # 定义批量操作功能  （multi_init是一个功能名称，可任意修改）
     multi_init.text = "批量初始化"  # 定义批量操作功能的显示名称
 
